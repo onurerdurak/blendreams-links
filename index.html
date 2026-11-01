@@ -106,19 +106,11 @@ body{padding:34px 16px 22px;position:relative;min-height:100vh}
 .ic .chip::before{content:"";position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .35s ease}
 .ic .chip svg{width:31px;height:31px}
 .ic .lbl{font-family:var(--mono);font-size:11.5px;color:var(--muted);transition:color .25s ease}
-.ic:hover .chip{transform:translateY(-3px);border-color:transparent;color:#fff}
-.ic:hover .chip::before{opacity:1}
-.ic:hover .lbl{color:var(--text)}
 .yt .chip::before{background:radial-gradient(circle at 30% 30%,#ff7a3a,#e3223f 70%)}
 .ig .chip::before{background:radial-gradient(circle at 30% 110%,#ffb347,#e1306c 45%,#8a3ab9 85%)}
 .gr .chip::before{background:radial-gradient(circle at 30% 30%,#ff90e8,#c25bd9 75%)}
 .st .chip::before{background:radial-gradient(circle at 30% 30%,#ff9a3c,#e8590c 75%)}
 .web .chip::before{background:radial-gradient(circle at 30% 30%,#6a8bff,#7b4de0 75%)}
-.yt:hover .chip{box-shadow:0 10px 26px rgba(227,34,63,.45)}
-.ig:hover .chip{box-shadow:0 10px 26px rgba(225,48,108,.45)}
-.gr:hover .chip{box-shadow:0 10px 26px rgba(194,91,217,.45)}
-.st:hover .chip{box-shadow:0 10px 26px rgba(232,89,12,.45)}
-.web:hover .chip{box-shadow:0 10px 26px rgba(106,139,255,.45)}
 
 /* ─── section label ─────────────────────────────────────────────── */
 .section-head{width:100%;display:flex;align-items:center;gap:14px;margin:28px 0 14px}
@@ -152,12 +144,8 @@ body{padding:34px 16px 22px;position:relative;min-height:100vh}
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
   opacity:0;transition:opacity .3s ease
 }
-.feat:hover .tile{transform:translateY(-3px);box-shadow:0 16px 32px rgba(0,0,0,.55)}
-.feat:hover .tile::before{opacity:1;animation:ringspin 2.4s linear infinite}
-.feat:hover .tile img{transform:scale(1.06)}
 .tile.app{background:#000}
 .tile.app img{transform:scale(1.1)}
-.feat:hover .tile.app img{transform:scale(1.16)}
 .tile.hourglass{display:grid;place-items:center;background:radial-gradient(circle at 30% 20%,rgba(232,125,13,.6),transparent 65%),radial-gradient(circle at 80% 90%,rgba(58,111,255,.5),transparent 60%),#120d1f}
 .tile.hourglass svg{width:28px;height:28px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
 .feat .title{font-family:var(--display);font-weight:800;font-size:13.5px;line-height:1;letter-spacing:.03em;text-transform:uppercase;color:rgba(244,242,248,.92);white-space:nowrap}
@@ -201,8 +189,23 @@ body{padding:34px 16px 22px;position:relative;min-height:100vh}
 .band img[alt="Megapol"]{height:30px}
 .band img[alt="MKM Megapol Kültür Merkezi"]{height:28px}
 
-/* spotlight: dim the others while one is hovered */
-.wrap.is-hovering .ic:not(:hover),.wrap.is-hovering .feat:not(:hover){opacity:.5;filter:saturate(.8) brightness(.85)}
+/* hover effects only where there is a real mouse: on phones a tap would leave them stuck on */
+@media (hover:hover){
+  .ic:hover .chip{transform:translateY(-3px);border-color:transparent;color:#fff}
+  .ic:hover .chip::before{opacity:1}
+  .ic:hover .lbl{color:var(--text)}
+  .yt:hover .chip{box-shadow:0 10px 26px rgba(227,34,63,.45)}
+  .ig:hover .chip{box-shadow:0 10px 26px rgba(225,48,108,.45)}
+  .gr:hover .chip{box-shadow:0 10px 26px rgba(194,91,217,.45)}
+  .st:hover .chip{box-shadow:0 10px 26px rgba(232,89,12,.45)}
+  .web:hover .chip{box-shadow:0 10px 26px rgba(106,139,255,.45)}
+  .feat:hover .tile{transform:translateY(-3px);box-shadow:0 16px 32px rgba(0,0,0,.55)}
+  .feat:hover .tile::before{opacity:1;animation:ringspin 2.4s linear infinite}
+  .feat:hover .tile img{transform:scale(1.06)}
+  .feat:hover .tile.app img{transform:scale(1.16)}
+  /* spotlight: dim the others while one is hovered */
+  .wrap.is-hovering .ic:not(:hover),.wrap.is-hovering .feat:not(:hover){opacity:.5;filter:saturate(.8) brightness(.85)}
+}
 
 /* ─── animations ────────────────────────────────────────────────── */
 @keyframes rise{to{opacity:1;transform:none}}
@@ -217,8 +220,8 @@ body{padding:34px 16px 22px;position:relative;min-height:100vh}
   .feat:hover .tile::before{animation:none}
 }
 
-/* ─── small screens ─────────────────────────────────────────────── */
-@media (max-width:420px){
+/* ─── small screens (all phones; the desktop icon row needs ~502px) ── */
+@media (max-width:520px){
   .who{font-size:28px}
   .avatar{width:80px;height:80px}
   .idhead{gap:14px}
@@ -369,9 +372,11 @@ body{padding:34px 16px 22px;position:relative;min-height:100vh}
 
   const wrap=document.getElementById('wrap');
   wrap.querySelectorAll('.ic,.feat').forEach(el=>{
-    el.addEventListener('pointerenter',()=>wrap.classList.add('is-hovering'));
+    el.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse') wrap.classList.add('is-hovering');});
     el.addEventListener('pointerleave',()=>wrap.classList.remove('is-hovering'));
   });
+  // coming back from a link (back button / app switch) must not keep the spotlight on
+  addEventListener('pageshow',()=>wrap.classList.remove('is-hovering'));
 })();
 </script>
 </body>
